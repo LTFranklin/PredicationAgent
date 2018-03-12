@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PredictionAgent", "PredictionAgent\PredictionAgent.csproj", "{3D2A6547-7B05-410E-B907-9D3B8181A174}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D2A6547-7B05-410E-B907-9D3B8181A174}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D2A6547-7B05-410E-B907-9D3B8181A174}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D2A6547-7B05-410E-B907-9D3B8181A174}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D2A6547-7B05-410E-B907-9D3B8181A174}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DFD5F310-C03A-46E1-B51A-074E4ED01743}
+	EndGlobalSection
+EndGlobal
