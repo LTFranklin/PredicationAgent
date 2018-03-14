@@ -20,13 +20,15 @@ namespace PredictionAgent
             double learningRate = 0.1;
             double prediction = 0;
             double errTot;
+            StreamWriter write = new StreamWriter("output.txt");
 
             double[] input = LoadInput();
             for (int j = 0; j < 1000; ++j)
             {
                 errTot = 0;
-                for (int i = 0; i < input.Length - 3; ++i)
+                for (int i = 0; i < 2000; ++i)
                 {
+
                     prediction = DoWork(input, weights, threshhold, i);
                     double sig = CalcSig(prediction);
 
@@ -36,16 +38,22 @@ namespace PredictionAgent
                     weights[2] = AdjustWeights(input[i], input[i] - prediction, weights[2], sig, learningRate);
                 }
                 errTot = errTot / input.Length;
-                Console.Write("Prediction: {0}, Actual: {1}, Average Error: {2}\n", prediction.ToString(), input[input.Length-3].ToString(), errTot.ToString());
+                //Console.Write("Prediction: {0}, Actual: {1}, Average Error: {2}\n", prediction.ToString(), input[input.Length-3].ToString(), errTot.ToString());
+            }
+
+            for(int i = 2000; i < input.Length - 2; ++i)
+            {
+                prediction = DoWork(input, weights, threshhold, i);
+                write.WriteLine(prediction.ToString());
             }
 
         }
 
         static double[] LoadInput()
         {
-            double[] arr = new double[2000];
+            double[] arr = new double[3500];
             StreamReader read = new StreamReader("input.txt");
-            for(int i = 0; i < 2000; ++i)
+            for(int i = 0; i < 3500; ++i)
             {
                 arr[i] = double.Parse(read.ReadLine());
             }
