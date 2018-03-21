@@ -13,17 +13,16 @@ namespace PredictionAgent
         {
             //declare variables
             Random rand = new Random();
-            double[] weights = new double[3];
-            weights[0] = rand.NextDouble();
-            weights[1] = rand.NextDouble();
-            weights[2] = rand.NextDouble();
+            double[] weights = { 0, 1, 2 };// rand.NextDouble(), rand.NextDouble(), rand.NextDouble() };
 
             //should be random? not yet implemented
             double threshhold = 0;
             //other vars
-            double learningRate = 0.1;
+            double learningRate = 0.4;
             double prediction = 0;
             double errTot;
+            double prev = 0 ;
+            bool x = false;
             //used for output
             StreamWriter write = new StreamWriter("output.txt");
             StreamWriter write2 = new StreamWriter("error.txt");
@@ -32,18 +31,34 @@ namespace PredictionAgent
             for (int j = 0; j < 2000; ++j)
             {
                 errTot = 0;
-                for (int i = 2; i < 2000; ++i)
+                for (int i = 200; i < 3502; ++i)
                 {
                     prediction = DoWork(input, weights, threshhold, i);
                     double sig = CalcSig(prediction);
-
+                    double err = input[i] - prediction;
                     errTot += input[i] - prediction;
-                    weights[0] = AdjustWeights(input[i], input[i] - prediction, weights[0], sig, learningRate);
-                    weights[1] = AdjustWeights(input[i], input[i] - prediction, weights[1], sig, learningRate);
+                    weights[0] = AdjustWeights(input[i-2], input[i] - prediction, weights[0], sig, learningRate);
+                    weights[1] = AdjustWeights(input[i-1], input[i] - prediction, weights[1], sig, learningRate);
                     weights[2] = AdjustWeights(input[i], input[i] - prediction, weights[2], sig, learningRate);
+                    if(x)
+                    {
+                        Console.WriteLine(weights[0]);
+                    }
                 }
-                errTot = errTot / 2000;
+                errTot = errTot / 3502;
+
+                if (prev != 0 && Math.Abs(prev) - Math.Abs(errTot) < 0)
+                {
+                    //x = true;
+                }
+
+                prev = errTot;
                 write2.WriteLine(errTot);
+                //Console.WriteLine(errTot);
+                if(-0.001 < errTot && errTot < 0.001)
+                {
+                    //break;
+                }
                 //Console.Write("Prediction: {0}, Actual: {1}, Average Error: {2}\n", prediction.ToString(), input[input.Length-3].ToString(), errTot.ToString());
             }
 
@@ -76,11 +91,10 @@ namespace PredictionAgent
             //sets a total to zero
             double total = 0;
 
-            //shouldnt this be taking  more inputs?
             //loops through a number of values and adds them to the total after multiplying them by the weights
             for (int i = 0; i < 3; ++i)
             {
-                total += (x[i + pos] * w[i]);
+                total += (x[pos - i] * w[i]);
             }
 
             //add the threshold and divide by the number of values used -> is this right?
