@@ -11,64 +11,43 @@ namespace PredictionAgent
     {
         static void Main(string[] args)
         {
-            //declare variables
             Random rand = new Random();
-            double[] weights = {rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), rand.NextDouble() };
-
-            //should be random? not yet implemented
-            double threshhold = 0;
-            //other vars
-            double learningRate = 0.5;
-            double prediction = 0;
-            double errTot;
-            double prev = 0 ;
-            bool x = false;
-            //used for output
-            StreamWriter write = new StreamWriter("output.txt");
-            StreamWriter write2 = new StreamWriter("error.txt");
-
             double[] input = LoadInput();
-            for (int j = 0; j < 5000; ++j)
+            double[] weights = { rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), 0 };
+            double learningRate = 0.1;
+            double[] predictions = new double[input.Count() - 3];
+
+            StreamWriter write = new StreamWriter("output.txt");
+            double cost = 1;
+
+            while (cost > 0.0000000000001)
             {
-                errTot = 0;
-                for (int i = 200; i < 3502; ++i)
-                {
-                    prediction = DoWork(input, weights, threshhold, i);
-                    double sig = CalcSig(prediction);
-                    double err = input[i] - prediction;
-                    errTot += Math.Pow(2,input[i] - prediction);
-                    weights[0] = AdjustWeights(input[i-2], err, weights[0], sig, learningRate);
-                    weights[1] = AdjustWeights(input[i-1], err, weights[1], sig, learningRate);
-                    weights[2] = AdjustWeights(input[i], err, weights[2], sig, learningRate);
-                    weights[3] = AdjustWeights(1, err, weights[3], sig, learningRate);
-                    if(x)
-                    {
-                        Console.WriteLine(weights[0]);
-                    }
-                }
-                errTot = errTot / 3302;
 
-                if (prev != 0 && Math.Abs(prev) - Math.Abs(errTot) < 0)
+                for (int i = 0; i < input.Count() - 3; ++i)
                 {
-                    //x = true;
+                    //get the sum of XW
+                    double sum = (weights[0] * input[i]) + (weights[1] * input[i + 1]) + (weights[2] * input[i + 2]) + weights[3];
+                    //get the sig (output)
+                    double sig = Activate(sum);
+                    //calculate the cost
+                    cost = 0.5 * Math.Pow((input[i + 3] - sig), 2);
+                    //adjust weights (w + LR * Error * x * s'(x))
+                    weights[0] = weights[0] + learningRate * (input[i + 3] - sig) * input[i] * sig * (1 - sig);
+                    weights[1] = weights[1] + learningRate * (input[i + 3] - sig) * input[i + 1] * sig * (1 - sig);
+                    weights[2] = weights[2] + learningRate * (input[i + 3] - sig) * input[i + 2] * sig * (1 - sig);
+                    weights[3] = weights[3] + learningRate * (input[i + 3] - sig) * sig * (1 - sig);
                 }
-
-                prev = errTot;
-                write2.WriteLine(errTot);
-                //Console.WriteLine(errTot);
-                if(-0.001 < errTot && errTot < 0.001)
-                {
-                    //break;
-                }
-                //Console.Write("Prediction: {0}, Actual: {1}, Average Error: {2}\n", prediction.ToString(), input[input.Length-3].ToString(), errTot.ToString());
+                Console.WriteLine(cost);
             }
 
-            for (int i = 2; i < input.Length - 2; ++i)
+            //write out the predictions with no weight adjustment
+            for (int i = 0; i < input.Count() - 4; ++i)
             {
-                write.WriteLine(DoWork(input, weights, threshhold, i));
+                predictions[i] = Activate((weights[0] * input[i + 2]) + (weights[1] * input[i + 3]) + (weights[2] * input[i + 4]) + weights[3]);
+                write.WriteLine(predictions[i]);
             }
+
             write.Close();
-            write2.Close();
         }
 
         //gets the input data
@@ -86,35 +65,23 @@ namespace PredictionAgent
             return arr;
         }
 
-        //predicts the next value
-        static double DoWork(double[] x, double[] w, double threshold, int pos)
+        static double Activate(double sum)
         {
-            //sets a total to zero
-            double total = 0;
-
-            //loops through a number of values and adds them to the total after multiplying them by the weights
-            for (int i = 0; i < 3; ++i)
+            //perceptron output
+            /*if(sum > 0.5)
             {
-                total += (x[pos - i] * w[i]);
+                return 1;
             }
-            total -= threshold * w[3];
-            //add the threshold and divide by the number of values used -> is this right?
-            return (total - threshold) / 3;
-        }
+            else
+            {
+                return 0;
+            }*/
 
-        //calculates the sigmoid
-        static double CalcSig(double prediction)
-        {
-            //
-            double ex = Math.Pow(4.95E-10, -prediction);
+            double ex = Math.Pow(Math.E, -sum);
             double sig = Math.Pow(ex + 1, -1);
 
             return sig;
-        }
 
-        static double AdjustWeights(double input, double error, double w, double sig, double learningRate)
-        {
-            return w + (error * sig * learningRate);
         }
     }
 }
